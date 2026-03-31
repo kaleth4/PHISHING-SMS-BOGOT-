@@ -2,11 +2,13 @@ Phishing Infrastructure Analysis (AWS S3 & CloudFront)Investigación técnica de
 
 📋 Resumen del IncidenteSe detectó un vector de ataque basado en ingeniería social (SMS) que redirige a las víctimas a un entorno de phishing altamente disponible alojado en AWS.Mensaje Detectado: "Su cuenta ha recibido 300.000 COP$. Por favor, revise su saldo lo antes posible." 
 
-🛠️ Fase de Reconocimiento y RedirecciónEl atacante utiliza una cadena de saltos para dificultar el rastreo del servidor de origen.1. Análisis de Cabeceras (Redir Chain)Utilizando curl, se identificó una redirección permanente (301) desde un acortador hacia el dominio final.Bash# Comprobando el salto inicial
+🛠️ Fase de Reconocimiento y RedirecciónEl atacante utiliza una cadena de saltos para dificultar el rastreo del servidor de origen.
+1. Análisis de Cabeceras (Redir Chain)Utilizando curl, se identificó una redirección permanente (301) desde un acortador hacia el dominio final.Bash# Comprobando el salto inicial
 $ curl -I https://did.li/c5bsl
 HTTP/2 301
 location: https://www.xy321.club?tr=z34&r=18
 server: AmazonS3
+
 via: 1.1 CloudFront
 2. Identificación del BackendEl análisis de las respuestas HTTP confirmó que el contenido es estático y servido a través de una red de distribución de contenido (CDN).Hosting: Amazon S3 (Bucket configurado para sitios web).CDN: CloudFront (Edge computing para baja latencia y evasión de IP-blocking).Caché: x-cache: Hit from cloudfront.
 
