@@ -1,0 +1,21 @@
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+OUTPUT_FILE: resultado.txt
+START_TIME: Tue Mar 31 09:47:31 2026
+URL_BASE: https://d16nkh0dr5k1oh.cloudfront.net/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612
+
+---- Scanning URL: https://d16nkh0dr5k1oh.cloudfront.net/ ----
++ https://d16nkh0dr5k1oh.cloudfront.net/soap (CODE:200|SIZE:0)
+
+-----------------
+END_TIME: Tue Mar 31 09:56:44 2026
+DOWNLOADED: 4612 - FOUND: 1

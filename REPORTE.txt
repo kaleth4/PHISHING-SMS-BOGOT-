@@ -1,0 +1,172 @@
+Reporte Técnico de Seguridad – Campaña de Phishing (Smishing) + Análisis de Infraestructura AWS
+1. Resumen Ejecutivo
+
+Se identificó una campaña activa de phishing mediante SMS (smishing) que utiliza técnicas de evasión basadas en redirecciones y hosting en infraestructura cloud (AWS S3 + CloudFront).
+
+El análisis técnico permitió:
+
+Confirmar la cadena completa de ataque
+Identificar el uso de redirectores para ocultar el payload
+Analizar la infraestructura backend (S3 + CDN)
+Detectar controles de seguridad (WAF / rate limiting)
+Enumerar rutas sensibles en el servidor objetivo
+2. Alcance del análisis
+-Activos analizados
+
+URL acortada:
+
+https://did.li/c5bsl
+
+Dominio final:
+
+https://www.xy321.club
+3. Vector de ataque inicial (Smishing)
+-Evidencia
+
+Mensaje SMS:
+
+“Su cuenta ha recibido 300.000 COP$. Por favor, revise su saldo lo antes posible. https://did.li/c5bsl”
+-Análisis
+Uso de ingeniería social basada en urgencia financiera
+Inclusión de URL acortada para evasión
+Mensaje diseñado para inducir interacción inmediata
+4. Análisis de redirección (Redirect Chain)
+-Prueba realizada
+curl -I https://did.li/c5bsl
+-Resultado
+HTTP/2 301
+location: https://www.xy321.club?tr=z34&r=18
+server: AmazonS3
+via: CloudFront
+-Interpretación
+Se confirma redirección HTTP 301 (permanente)
+Uso de:
+Amazon S3 como backend
+CloudFront como CDN
+⚠️ Hallazgos
+Uso de redirector para ocultar destino final
+
+Parámetros detectados:
+
+?tr=z34&r=18
+
+Posible:
+
+Tracking de campaña
+Identificador de víctima
+5. Análisis de infraestructura del dominio final
+5.1 Resolución HTTP vs HTTPS
+Pruebas:
+curl -I http://www.xy321.club
+curl -I https://www.xy321.club
+-Resultados
+HTTP:
+301 Moved Permanently → https://www.xy321.club/
+HTTPS:
+HTTP/2 200 OK
+server: AmazonS3
+x-cache: Hit from cloudfront
+-Interpretación
+Redirección HTTP → HTTPS correctamente implementada
+Contenido servido desde:
+Amazon S3 (hosting estático)
+CloudFront (capa CDN)
+5.2 Características del backend
+Componente	Tecnología
+Hosting	AWS S3
+CDN	CloudFront
+Tipo de app	Estática (HTML + JS)
+5.3 Cache
+x-cache: Hit from cloudfront
+age: 15631
+
+-Indica:
+
+Contenido cacheado (~4 horas)
+Posible vector teórico: cache poisoning
+⚠️ 6. Error de configuración detectado (S3)
+-Evidencia
+Code: NoSuchKey
+Message: The specified key does not exist.
+Key: /index.html
+-Interpretación
+El objeto solicitado no existe en el bucket
+Indica:
+Deploy incompleto o mal configurado
+Routing incorrecto en CloudFront
+🔎 Información expuesta
+RequestId
+HostId
+
+👉 Usados para:
+
+Debug interno AWS
+No explotables directamente
+7. Enumeración de contenido (Gobuster)
+-Prueba realizada
+gobuster dir -u https://www.xy321.club -w wordlist.txt
+-Resultados relevantes
+🟡 Status 403 (Forbidden)
+.git/HEAD
+.htaccess
+.ssh
+.bash_history
+.htpasswd
+-Interpretación
+Recursos sensibles existen o son reconocidos
+Acceso bloqueado por servidor
+⚠️ Riesgo
+Enumeración de estructura interna
+Posible exposición si se logra bypass
+🚫 Status 429 (Too Many Requests)
+index.html
+robots.txt
+php.ini
+web.config
+-Interpretación
+Activación de rate limiting
+Protección anti-scanning activa
+8. Controles de seguridad identificados
+Control	Evidencia
+CDN	CloudFront
+Rate limiting	429 responses
+Access control	403 responses
+9. Pruebas de evasión realizadas
+-Técnicas probadas
+Header spoofing:
+X-Forwarded-For: 127.0.0.1
+User-Agent manipulation:
+User-Agent: Googlebot
+Path manipulation:
+--path-as-is
+-Resultado
+No bypass exitoso
+Respuestas consistentes (404 / NoSuchKey)
+🚨 10. Evaluación de vulnerabilidades
+🟥 1. Phishing (Smishing)
+Tipo: Ingeniería social
+Severidad: ALTA
+Impacto:
+Robo de credenciales
+Fraude financiero
+🟡 2. Enumeración de recursos sensibles
+Tipo: Information Disclosure (indirecta)
+Severidad: BAJA
+🟡 3. Exposición de infraestructura (S3 + CloudFront)
+Tipo: Información técnica
+Severidad: BAJA
+🟢 4. Configuración HTTP/HTTPS
+Estado: Correcto
+Vulnerabilidad: ❌ No
+🔗 11. Cadena de ataque completa
+SMS (ingeniería social)
+        ↓
+URL acortada (did.li)
+        ↓
+Redirección HTTP 301
+        ↓
+Dominio phishing (xy321.club)
+        ↓
+Hosting en S3 + CloudFront
+        ↓
+Entrega de contenido malicioso (HTML/JS)
