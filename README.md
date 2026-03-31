@@ -23,3 +23,6 @@ Evidencia de Configuración IncorrectaEl servidor expone detalles técnicos inne
 🛡️ Controles de Seguridad DetectadosDurante el pentesting, se identificaron mecanismos de defensa activos en la infraestructura del atacante:Rate Limiting: El servidor bloquea ráfagas de peticiones con estados 429.Access Control: Restricción de acceso a archivos de configuración mediante estados 403.Cifrado: Implementación obligatoria de HTTPS vía redirección 301 desde el puerto 80.
 
 📈 Conclusiones TécnicasSeveridad: ALTA. El uso de parámetros como ?tr=z34 sugiere un sistema de tracking para identificar individualmente a las víctimas.Infraestructura: El uso de AWS CloudFront permite al atacante rotar IPs rápidamente si los nodos son reportados.Vulnerabilidad Principal: Ingeniería social combinada con una configuración de infraestructura profesional que imita servicios legítimos.
+
+d8021fd2f36dfc093593bee4e40fab268653058b4ac6964a8772ba6b980b07e1
+www.xy321.club
