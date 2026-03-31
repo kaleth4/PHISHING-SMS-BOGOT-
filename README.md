@@ -1,4 +1,3 @@
-
 Phishing Infrastructure Analysis (AWS S3 & CloudFront)Investigación técnica de una campaña activa de Smishing dirigida a usuarios en Colombia, utilizando técnicas de evasión mediante infraestructura distribuida en la nube.📋 Resumen del IncidenteSe detectó un vector de ataque basado en ingeniería social (SMS) que redirige a las víctimas a un entorno de phishing altamente disponible alojado en AWS.Mensaje Detectado: "Su cuenta ha recibido 300.000 COP$. Por favor, revise su saldo lo antes posible." 🛠️ Fase de Reconocimiento y RedirecciónEl atacante utiliza una cadena de saltos para dificultar el rastreo del servidor de origen.1. Análisis de Cabeceras (Redir Chain)Utilizando curl, se identificó una redirección permanente (301) desde un acortador hacia el dominio final.Bash# Comprobando el salto inicial
 $ curl -I https://did.li/c5bsl
 
